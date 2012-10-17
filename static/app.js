@@ -8,7 +8,7 @@ $(function(){
 
 	function relative_time(time_value) {
 		var values = time_value.split(" ");
-		// time_value = values[2] + " " + values[1] + ", " + values[3] + " " + values[5];
+		time_value = values[2] + " " + values[1] + ", " + values[3] + " " + values[5];
 		var parsed_date = Date.parse(time_value);
 		var relative_to = (arguments.length > 1) ? arguments[1] : new Date();
 		var delta = parseInt((relative_to.getTime() - parsed_date) / 1000);
@@ -179,7 +179,6 @@ $(function(){
 			return 'http://search.twitter.com/search.json?q=' + this.query +  '&rpp=1000' + '&callback=?';
         },
         query: '', //default query
-        page: '1',
         parse: function(resp, xhr) {
 			return resp.results;
         }
@@ -237,6 +236,25 @@ $(function(){
 				searchList: this.searchList
 			});
 
+			
+			var i=1;
+			while(localStorage.getItem("hist")>=i)
+			{
+			var query= localStorage.getItem("query"+i);
+			var FB=false;
+			if(localStorage.getItem("FB"+i)==="true")
+				FB=true;
+			var Tweet=false;
+			if(localStorage.getItem("Twitter"+i)==="true")
+				Tweet=true;
+			this.searchList.add({
+					query:query,
+					isFB: FB,
+					isTwitter: Tweet
+				});
+			i++;
+			}
+			
 			//set event handlers
 			_.bindAll(this, 'onTweetAdd');
 			this.tweets.bind('add', this.onTweetAdd);
@@ -294,6 +312,18 @@ $(function(){
 
 			//if not add to search history
 			if (newSearch) {
+			if(localStorage.getItem("hist")==null)
+			{
+				localStorage.setItem("hist",1);
+			}
+			else
+			{
+				localStorage.setItem("hist",parseInt(localStorage.getItem("hist"))+1)
+			}
+			var i=localStorage.getItem("hist");
+			localStorage.setItem("query"+i, query); 
+			localStorage.setItem("FB"+i, isFB); 
+			localStorage.setItem("Twitter"+i, isTwitter); 
 				this.searchList.add({
 					query: query,
 					isFB: isFB,
